@@ -1,0 +1,37 @@
+# ----------------------------------------------------------------------
+# OpenLiteSpeed / LiteSpeed Aggressive Caching for JS Assets
+# ----------------------------------------------------------------------
+
+# 1. LiteSpeed Cache specific configuration
+<IfModule LiteSpeed>
+    CacheEnable public
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} ^HEAD|GET$
+    RewriteCond %{REQUEST_URI} \.(js|css|webp|png|jpg|jpeg|gif|svg|woff2?)$ [NC]
+    RewriteRule .* - [E=Cache-Control:max-age=31536000]
+</IfModule>
+
+# 2. Apache/OLS Headers for Cache-Control (Aggressive 1 Year)
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
+
+# 3. Expires Headers fallback
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType application/x-javascript "access plus 1 year"
+</IfModule>
+
+# 4. MIME Types & Compression
+# Nota: OpenLiteSpeed y LiteSpeed Enterprise procesan la compresión Brotli/Gzip a nivel 
+# de motor nativo. Tu servidor debe tener "Enable Brotli Compression: Yes" en la pestaña "Tuning".
+# Aquí nos aseguramos de que el servidor trate los scripts con el MIME Type correcto para 
+# garantizar que el motor de compresión lo reconozca como comprimible.
+<IfModule mod_mime.c>
+    AddType application/javascript js mjs
+</IfModule>

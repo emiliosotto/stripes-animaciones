@@ -1,0 +1,12 @@
+# WordPress Plugin ignore
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+*.log
+.git/
+.svn/
+.idea/
+.vscode/
+*.bak
+*.swp
