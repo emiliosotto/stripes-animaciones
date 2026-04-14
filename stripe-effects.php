@@ -3,7 +3,7 @@
  * Plugin Name: Stripe Effects
  * Description: Interactive Stripe globe using Cobe.
  * Version: 1.0.0
- * Author: Antigravity
+ * Author: Klikstudio
  */
 declare(strict_types=1);
 

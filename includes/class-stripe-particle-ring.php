@@ -24,30 +24,45 @@ class Stripe_Particle_Ring {
         wp_enqueue_script_module( 'stripe-particle-ring-script' );
 
         $defaults = [
-            'width'  => '800',
-            'height' => '800',
-            'align'  => 'center',
+            'width'      => '800',
+            'height'     => '800',
+            'align'      => 'center', // Container alignment
+            'text_align' => 'center', // Content text alignment
+            'ring_align' => 'center', // Ring position within canvas
         ];
         $atts = shortcode_atts( $defaults, (array) $atts, 'stripe_particle_ring' );
-        $width  = esc_attr( $atts['width'] );
-        $height = esc_attr( $atts['height'] );
-        $align  = esc_attr( $atts['align'] );
+        
+        $width      = esc_attr( $atts['width'] );
+        $height     = esc_attr( $atts['height'] );
+        $align      = esc_attr( $atts['align'] );
+        $text_align = esc_attr( $atts['text_align'] );
+        $ring_align = esc_attr( $atts['ring_align'] );
 
-        $margin_css = '0 auto'; // center fallback
+        // Unique ID for this instance
+        $instance_id = 'stripe-ring-' . wp_generate_password( 8, false );
+
+        $margin_css = '0 auto'; 
         if ( $align === 'left' ) {
             $margin_css = '0 auto 0 0';
         } elseif ( $align === 'right' ) {
             $margin_css = '0 0 0 auto';
         }
 
+        // Mapping for content flex alignment
+        $flex_align = 'center';
+        if ( $text_align === 'left' ) {
+            $flex_align = 'flex-start';
+        } elseif ( $text_align === 'right' ) {
+            $flex_align = 'flex-end';
+        }
+
         ob_start();
         ?>
-        <div class="stripe-particle-ring-wrapper" style="width: <?php echo $width; ?>px; height: <?php echo $height; ?>px; position: relative; overflow: hidden; border-radius: 12px; margin: <?php echo $margin_css; ?>; background: transparent;">
-            <canvas id="stripe-particle-ring-canvas" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;" data-width="<?php echo $width; ?>" data-height="<?php echo $height; ?>"></canvas>
+        <div class="stripe-particle-ring-wrapper" style="width: 100%; max-width: <?php echo $width; ?>px; height: <?php echo $height; ?>px; position: relative; overflow: hidden; border-radius: 12px; margin: <?php echo $margin_css; ?>; background: transparent; box-sizing: border-box;">
+            <canvas class="stripe-particle-ring-canvas" id="<?php echo $instance_id; ?>" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;" data-width="<?php echo $width; ?>" data-height="<?php echo $height; ?>" data-ring-align="<?php echo $ring_align; ?>"></canvas>
             <?php if ( ! empty( $content ) ) : ?>
-                <div class="stripe-particle-ring-content" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-start;">
+                <div class="stripe-particle-ring-content" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-start; align-items: <?php echo $flex_align; ?>; text-align: <?php echo $text_align; ?>;">
                     <?php 
-                        // Remove empty paragraph tags WordPress often injects around shortcodes
                         $clean_content = preg_replace('/<p>\s*(<br\s*\/?>)?\s*<\/p>/i', '', $content);
                         echo do_shortcode( wp_kses_post( trim( $clean_content ) ) ); 
                     ?>
